@@ -12,7 +12,7 @@
       align-items: center;
       justify-content: center;
       background: #fff7c2; /* soft yellow */
-      font-family: 'Comic Sans MS', cursive, Verdana, Geneva, sans-serif; /* cute web-safe font */
+      font-family: 'Comic Sans MS', cursive, Verdana, Geneva, sans-serif;
     }
 
     .box {
@@ -54,8 +54,7 @@
       border-radius: 10px;
       background: #ffeaa7;
       cursor: pointer;
-      font-size: 13px;
-      font-family: 'Verdana'; /* cute web-safe font */
+      font-size: 16px;
       transition: 0.3s;
     }
 
@@ -76,7 +75,6 @@
       border-radius: 10px;
       width: 220px;
       font-size: 12px;
-      font-family: 'Verdana'; /* cute web-safe font */
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       text-align: left;
       z-index: 10;
@@ -92,6 +90,18 @@
       margin: 20px 0;
     }
 
+    .task-display {
+      margin: 10px 0 20px 0;
+      font-size: 14px;
+      text-align: left;
+      background: #fff8d6;
+      padding: 10px;
+      border-radius: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+
     .controls button {
       margin: 5px;
       padding: 10px 18px;
@@ -100,7 +110,6 @@
       background: #ffeaa7;
       cursor: pointer;
       font-size: 15px;
-      font-family: 'Tahoma, Geneva, sans-serif'; /* cute web-safe font */
       transition: 0.2s;
     }
 
@@ -108,7 +117,6 @@
       background: #ffd97a;
     }
 
-    /* Progress bar container */
     .progress-container {
       width: 100%;
       height: 12px;
@@ -116,7 +124,7 @@
       border-radius: 6px;
       margin-top: 20px;
       position: relative;
-      direction: rtl; /* right to left */
+      direction: rtl;
     }
 
     .progress-bar {
@@ -142,9 +150,9 @@
   <div class="egg-icon">🥚</div>
   <h2>Egg Timer</h2>
 
-  <div class="options">
+  <div class="options" id="options">
     <div class="egg-option">
-      <button onclick="setTime(300)">Soft — 5 min</button>
+      <button onclick="selectOption('soft')">Soft — 5 min</button>
       <div class="egg-info">
         <strong>Texture:</strong> Whites set but tender<br>
         <strong>Yolk:</strong> Runny or very soft<br>
@@ -154,7 +162,7 @@
     </div>
 
     <div class="egg-option">
-      <button onclick="setTime(480)">Medium — 8 min</button>
+      <button onclick="selectOption('medium')">Medium — 8 min</button>
       <div class="egg-info">
         <strong>Texture:</strong> Whites fully set<br>
         <strong>Yolk:</strong> Jammy, thick, custard-like<br>
@@ -164,7 +172,7 @@
     </div>
 
     <div class="egg-option">
-      <button onclick="setTime(600)">Hard — 10 min</button>
+      <button onclick="selectOption('hard')">Hard — 10 min</button>
       <div class="egg-info">
         <strong>Texture:</strong> Whites firm<br>
         <strong>Yolk:</strong> Fully cooked, crumbly<br>
@@ -175,6 +183,8 @@
   </div>
 
   <div id="timerDisplay">00:00</div>
+
+  <div class="task-display" id="taskDisplay"></div>
 
   <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
@@ -195,6 +205,49 @@
 
   const progressBar = document.getElementById('progressBar');
   const chicken = document.querySelector('.chicken');
+  const optionsDiv = document.getElementById('options');
+  const taskDisplay = document.getElementById('taskDisplay');
+
+  const tasks = {
+  soft: [
+    `"Smells Like Teen Spirit" – Nirvana (5:01): By the time Kurt Cobain finishes the final scream, your yolk is liquid gold.`,
+    `Optical Eye Massage: Look at an object 20 feet away for 20 seconds (20-20-20 rule) 5 times.`,
+    `"Bohemian Rhapsody" - Drop the egg into boiling water when the song starts, butter your toast during the opera section, and pull it out exactly when the final gong hits.`
+  ],
+  medium: [
+    `Micro-Journaling: Write down three things you need to do tomorrow.`,
+    `"Master of Puppets" – Metallica (8:35): If you prefer your eggs cooked with aggression.`,
+    `The "Phone Call": Call a parent or friend for a quick check-in.`
+  ],
+  hard: [
+    `Fold Laundry: You can fold about one basket of laundry in 10 minutes.`,
+    `"All Too Well (10 Minute Version)" – Taylor Swift (10:13): The modern standard for a 10-minute timer.`,
+    `Inbox Zero (Lite): Delete exactly 20 promotional emails or unsubscribe from 3 newsletters.`
+  ]
+};
+
+function selectOption(option) {
+  // Hide other options
+  Array.from(optionsDiv.children).forEach(child => {
+    const btn = child.querySelector('button');
+    if(btn.dataset.option === option){
+      child.style.display = 'block';
+    } else {
+      child.style.display = 'none';
+    }
+  });
+
+  // Set time
+  if(option === 'soft') setTime(300);
+  if(option === 'medium') setTime(480);
+  if(option === 'hard') setTime(600);
+
+  // Display tasks as a list with spacing
+  taskDisplay.innerHTML = "<ul>" + tasks[option].map(task => `<li>${task}</li>`).join("") + "</ul>";
+}
+
+
+
 
   function setTime(sec) {
     timeLeft = sec;
@@ -232,6 +285,8 @@
     display(timeLeft);
     progressBar.style.width = '0%';
     chicken.style.right = '0%';
+    taskDisplay.innerText = '';
+    Array.from(optionsDiv.children).forEach(child => child.style.display = 'block');
   }
 
   function display(sec) {
@@ -246,6 +301,7 @@
     chicken.style.right = `calc(${percent}% - 12px)`;
   }
 </script>
+
 
 </body>
 </html>
