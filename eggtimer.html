@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Egg Timer</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff7c2; /* soft yellow */
+      font-family: 'Comic Sans MS', cursive, Verdana, Geneva, sans-serif; /* cute web-safe font */
+    }
+
+    .box {
+      background: #fffbea;
+      padding: 30px;
+      width: 400px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      position: relative;
+    }
+
+    .egg-icon {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0 0 15px 0;
+      font-weight: 600;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .egg-option {
+      position: relative;
+      flex: 1;
+      margin: 0 5px;
+    }
+
+    .egg-option button {
+      width: 100%;
+      padding: 12px 0;
+      border: none;
+      border-radius: 10px;
+      background: #ffeaa7;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'Verdana'; /* cute web-safe font */
+      transition: 0.3s;
+    }
+
+    .egg-option button:hover {
+      background: #ffd97a;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+    }
+
+    .egg-info {
+      display: none;
+      position: absolute;
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff8d6;
+      padding: 12px;
+      border-radius: 10px;
+      width: 220px;
+      font-size: 12px;
+      font-family: 'Verdana'; /* cute web-safe font */
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: left;
+      z-index: 10;
+    }
+
+    .egg-option:hover .egg-info {
+      display: block;
+    }
+
+    #timerDisplay {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .controls button {
+      margin: 5px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #ffeaa7;
+      cursor: pointer;
+      font-size: 15px;
+      font-family: 'Tahoma, Geneva, sans-serif'; /* cute web-safe font */
+      transition: 0.2s;
+    }
+
+    .controls button:hover {
+      background: #ffd97a;
+    }
+
+    /* Progress bar container */
+    .progress-container {
+      width: 100%;
+      height: 12px;
+      background: #ffeaa7;
+      border-radius: 6px;
+      margin-top: 20px;
+      position: relative;
+      direction: rtl; /* right to left */
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: #ffd97a;
+      border-radius: 6px;
+      transition: width 0.1s linear;
+    }
+
+    .chicken {
+      position: absolute;
+      top: -18px;
+      right: 0;
+      font-size: 20px;
+      transition: right 0.1s linear;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <div class="egg-icon">🥚</div>
+  <h2>Egg Timer</h2>
+
+  <div class="options">
+    <div class="egg-option">
+      <button onclick="setTime(300)">Soft — 5 min</button>
+      <div class="egg-info">
+        <strong>Texture:</strong> Whites set but tender<br>
+        <strong>Yolk:</strong> Runny or very soft<br>
+        <strong>Time:</strong> 5–6 min<br>
+        <strong>Best for:</strong> Ramen, toast soldiers, salads
+      </div>
+    </div>
+
+    <div class="egg-option">
+      <button onclick="setTime(480)">Medium — 8 min</button>
+      <div class="egg-info">
+        <strong>Texture:</strong> Whites fully set<br>
+        <strong>Yolk:</strong> Jammy, thick, custard-like<br>
+        <strong>Time:</strong> 7–8 min<br>
+        <strong>Best for:</strong> Sandwiches, rice bowls, snack boxes
+      </div>
+    </div>
+
+    <div class="egg-option">
+      <button onclick="setTime(600)">Hard — 10 min</button>
+      <div class="egg-info">
+        <strong>Texture:</strong> Whites firm<br>
+        <strong>Yolk:</strong> Fully cooked, crumbly<br>
+        <strong>Time:</strong> 10–12 min<br>
+        <strong>Best for:</strong> Egg curry, deviled eggs, meal prep
+      </div>
+    </div>
+  </div>
+
+  <div id="timerDisplay">00:00</div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="chicken">🐤</div>
+  </div>
+
+  <div class="controls">
+    <button onclick="startTimer()">Start</button>
+    <button onclick="stopTimer()">Stop</button>
+    <button onclick="resetTimer()">Reset</button>
+  </div>
+</div>
+
+<script>
+  let timeLeft = 0;
+  let totalTime = 0;
+  let countdown = null;
+
+  const progressBar = document.getElementById('progressBar');
+  const chicken = document.querySelector('.chicken');
+
+  function setTime(sec) {
+    timeLeft = sec;
+    totalTime = sec;
+    display(timeLeft);
+    updateProgress();
+  }
+
+  function startTimer() {
+    if (countdown) return;
+    countdown = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        countdown = null;
+        alert('Egg ready!');
+        progressBar.style.width = '0%';
+        chicken.style.right = '0%';
+        return;
+      }
+      timeLeft--;
+      display(timeLeft);
+      updateProgress();
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(countdown);
+    countdown = null;
+  }
+
+  function resetTimer() {
+    clearInterval(countdown);
+    countdown = null;
+    timeLeft = totalTime;
+    display(timeLeft);
+    progressBar.style.width = '0%';
+    chicken.style.right = '0%';
+  }
+
+  function display(sec) {
+    let m = Math.floor(sec / 60);
+    let s = sec % 60;
+    document.getElementById('timerDisplay').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  function updateProgress() {
+    const percent = totalTime ? ((totalTime - timeLeft) / totalTime) * 100 : 0;
+    progressBar.style.width = percent + '%';
+    chicken.style.right = `calc(${percent}% - 12px)`;
+  }
+</script>
+
+</body>
+</html>
